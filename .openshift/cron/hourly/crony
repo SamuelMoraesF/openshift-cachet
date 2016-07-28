@@ -1,0 +1,3 @@
+#!/bin/bash
+
+$OPENSHIFT_PHP_VERSION_DIR/bin/php $OPENSHIFT_REPO_DIR/artisan schedule:run >> /dev/null 2>&1

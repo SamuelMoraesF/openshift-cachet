@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+CONFIG="/sandbox/.env"
+
+# Build PHP extra's
+# Update conf/ini filesand install pecl extensions
+${OPENSHIFT_PHP_DIR}/bin/control build
+
+# Change current dir
+cd $OPENSHIFT_REPO_DIR
+
+# Copy config file
+if [ -f "$CONFIG" ]
+then
+	cp $CONFIG $OPENSHIFT_REPO_DIR/.env
+else
+    cp $OPENSHIFT_REPO_DIR/.env.example $OPENSHIFT_REPO_DIR/.env
+    
+fi
+
+# Change vars
+sed -i "s/DB_HOST=.*/DB_HOST=$OPENSHIFT_MYSQL_DB_HOST/g" $OPENSHIFT_REPO_DIR/.env
+sed -i "s/DB_DATABASE=.*/DB_DATABASE=cachet/g" $OPENSHIFT_REPO_DIR/.env
+sed -i "s/DB_USERNAME=.*/DB_USERNAME=$OPENSHIFT_MYSQL_DB_USERNAME/g" $OPENSHIFT_REPO_DIR/.env
+sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=$OPENSHIFT_MYSQL_DB_PASSWORD/g" $OPENSHIFT_REPO_DIR/.env
+sed -i "s/DB_PORT=.*/DB_PORT=$OPENSHIFT_MYSQL_DB_PORT/g" $OPENSHIFT_REPO_DIR/.env
+
+# Run Composer
+$OPENSHIFT_PHP_DIR/composer/bin/composer install --no-dev -o

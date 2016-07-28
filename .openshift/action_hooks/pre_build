@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Get latest Cachet release
+LATEST=`(curl --silent https://api.github.com/repos/cachethq/Cachet/releases/latest | grep 'tag_name' | sed 's/.*: "//g' | sed 's/".*//g')`
+
+# Change current dir
+cd $OPENSHIFT_REPO_DIR
+
+# Remove index.html file
+rm -fr public/
+
+# Clone cachet
+git clone https://github.com/CachetHQ/Cachet.git cachet
+
+# Go to latest version
+cd cachet
+git checkout $LATEST
+rm -fr .git
+
+# Move all cachet files to root
+cd ..
+mv cachet/* .
+mv cachet/.env.example .
+rm -fr cachet/
